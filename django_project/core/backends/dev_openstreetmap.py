@@ -1,16 +1,17 @@
 __author__ = 'Irwan Fathurrahman <irwan@kartoza.com>'
 __date__ = '21/05/19'
 
-from django.conf import settings
 from xml.dom import minidom
-from social_core.backends.openstreetmap import OpenStreetMapOAuth
+
+from django.conf import settings
+from social_core.backends.openstreetmap_oauth2 import OpenStreetMapOAuth2
 
 
-class OpenStreetMapDevOAuth(OpenStreetMapOAuth):
+class OpenStreetMapDevOAuth(OpenStreetMapOAuth2):
     """OpenStreetMap DEV OAuth authentication backend"""
-    AUTHORIZATION_URL = '%s/oauth/authorize' % settings.OSM_API_URL
-    REQUEST_TOKEN_URL = '%s/oauth/request_token' % settings.OSM_API_URL
-    ACCESS_TOKEN_URL = '%s/oauth/access_token' % settings.OSM_API_URL
+    AUTHORIZATION_URL = '%s/oauth2/authorize' % settings.OSM_API_URL
+    REQUEST_TOKEN_URL = '%s/oauth2/request_token' % settings.OSM_API_URL
+    ACCESS_TOKEN_URL = '%s/oauth2/access_token' % settings.OSM_API_URL
 
     def user_data(self, access_token, *args, **kwargs):
         """Return user data provided"""

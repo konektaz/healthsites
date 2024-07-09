@@ -15,3 +15,6 @@ pdbpp
 
 # mock
 mock
+
+# ssl server localhost
+django-sslserver==0.22

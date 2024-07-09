@@ -2,7 +2,6 @@
 """
 core.settings.contrib
 """
-import os
 from .base import *  # noqa
 from .keys import *  # noqa
 
@@ -159,6 +158,9 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesSto
 # -------------------------------------------------- #
 OSM_API_URL = 'https://api.openstreetmap.org'
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.openstreetmap.OpenStreetMapOAuth',
+    'social_core.backends.openstreetmap_oauth2.OpenStreetMapOAuth2',
     'django.contrib.auth.backends.ModelBackend',
+)
+SOCIAL_AUTH_AUTHENTICATION_BACKENDS = (
+    'social_core.backends.openstreetmap_oauth2.OpenStreetMapOAuth2',
 )

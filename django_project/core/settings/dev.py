@@ -1,3 +1,5 @@
+import os
+
 from .project import *  # noqa
 
 # Set debug to True for development
@@ -67,9 +69,23 @@ LOGGING = {
 # ----------             OSM            ------------ #
 # -------------------------------------------------- #
 # use master apis for dev
-DEV_OSM_API_URL = 'https://api06.dev.openstreetmap.org'
-OSM_API_URL = 'https://master.apis.dev.openstreetmap.org'
-AUTHENTICATION_BACKENDS = (
-    'core.backends.dev_openstreetmap.OpenStreetMapDevOAuth',
-    'django.contrib.auth.backends.ModelBackend',
-)
+if os.environ.get('USE_OSM_DEV', False):
+    DEV_OSM_API_URL = 'https://api06.dev.openstreetmap.org'
+    OSM_API_URL = 'https://master.apis.dev.openstreetmap.org'
+    AUTHENTICATION_BACKENDS = (
+        'core.backends.dev_openstreetmap.OpenStreetMapDevOAuth',
+        'django.contrib.auth.backends.ModelBackend',
+    )
+    SOCIAL_AUTH_AUTHENTICATION_BACKENDS = (
+        'core.backends.dev_openstreetmap.OpenStreetMapDevOAuth',
+    )
+
+try:
+    # use ssl
+    import sslserver  # noqa:F401
+
+    INSTALLED_APPS = INSTALLED_APPS + (
+        'sslserver',
+    )
+except ImportError:
+    pass
