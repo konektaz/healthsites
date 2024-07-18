@@ -41,7 +41,6 @@ x-common-django:
     # KEYS
     - CAPTCHA_SITE_KEY=${CAPTCHA_SITE_KEY}
     - CAPTCHA_SECRET_KEY=${CAPTCHA_SECRET_KEY}
-    - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
     - SOCIAL_AUTH_OPENSTREETMAP_KEY=${SOCIAL_AUTH_OPENSTREETMAP_KEY}
     - SOCIAL_AUTH_OPENSTREETMAP_SECRET=${SOCIAL_AUTH_OPENSTREETMAP_SECRET}
     - TEST_USERS=${TEST_USERS}
@@ -113,26 +112,22 @@ services:
     <<: *default-common-django
     container_name: healthsites_django
     command: 'uwsgi --ini /uwsgi.conf'
-    entrypoint: ["/home/web/django_project/entrypoint.sh"]
+    entrypoint: [ "/home/web/django_project/entrypoint.sh" ]
 
   # Celery worker that executes celery tasks created by Django.
   worker:
     <<: *default-common-django
     container_name: healthsites_worker
     command: celery -A core.celery:app worker -B -l debug
-    entrypoint: []
+    entrypoint: [ ]
 
   nginx:
     image: nginx
     container_name: "healthsites_nginx"
+    hostname: nginx
     volumes:
-      - static-data:/home/web/static:ro
-      - media-data:/home/web/media:ro
-    ports:
-      - "${HTTP_PORT}:8080"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 5
-        window: 120s
+      - conf-data:/etc/nginx/conf.d:ro
+      - static-data:/home/web/static
+      - media-data:/home/web/media
+    links:
+      - django
