@@ -1,3 +1,4 @@
+import ast
 import os
 
 from .project import *  # noqa
@@ -69,8 +70,7 @@ LOGGING = {
 # ----------             OSM            ------------ #
 # -------------------------------------------------- #
 # use master apis for dev
-if os.environ.get('USE_OSM_DEV', False):
-    DEV_OSM_API_URL = 'https://api06.dev.openstreetmap.org'
+if ast.literal_eval(os.environ.get('USE_OSM_DEV', True)):
     OSM_API_URL = 'https://master.apis.dev.openstreetmap.org'
     AUTHENTICATION_BACKENDS = (
         'core.backends.dev_openstreetmap.OpenStreetMapDevOAuth',

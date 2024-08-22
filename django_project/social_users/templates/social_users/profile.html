@@ -7,7 +7,7 @@
     <section class="white container">
         <div class="col-sm-3 user-profile">
             <div class="profile-image-size">
-                {% if user.social_auth.get.provider == "openstreetmap" %}
+                {% if user.is_default_provider %}
                     <img style="height: 20px" class="profile-image-icon" src="{% static "img/osm-logo.png" %}"/>
                 {% endif %}
                 {% if not user.profile_picture %}

@@ -4,7 +4,7 @@
         <div class="person col-xs-8 pad0x">
             <div class="avatar-holder">
                 <img src="{% static "img/av-holder.svg" %}" class="frame" width="48" height="48"/>
-                {% if user.provider == "openstreetmap" %}
+                {% if user.is_default_provider %}
                     <img height="14" class="avatar-icon" src="{% static "img/osm-logo.png" %}" title="OpenStreetMap"/>
                 {% elif user.provider == "facebook" %}
                     <i class="fa fa-facebook-square avatar-icon"></i>

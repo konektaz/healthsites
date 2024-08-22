@@ -11,11 +11,12 @@ from core.settings.tests import DEV_OSM_API_URL
 
 try:
     from core.settings.secret import (
-        SOCIAL_AUTH_OPENSTREETMAP_KEY,
-        SOCIAL_AUTH_OPENSTREETMAP_SECRET)
+        SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_KEY,
+        SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_SECRET
+    )
 except ImportError:
-    SOCIAL_AUTH_OPENSTREETMAP_KEY = ''
-    SOCIAL_AUTH_OPENSTREETMAP_SECRET = ''
+    SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_KEY = ''
+    SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_SECRET = ''
 
 if sys.version_info < (2, 7):
     import unittest2 as unittest
@@ -40,8 +41,8 @@ class TestOsmApi(unittest.TestCase):
         self.api_base = DEV_OSM_API_URL
         self.app_id = 'healthsites.testcase'
         self.api = OsmApiWrapper(
-            client_key=SOCIAL_AUTH_OPENSTREETMAP_KEY,
-            client_secret=SOCIAL_AUTH_OPENSTREETMAP_SECRET,
+            client_key=SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_KEY,
+            client_secret=SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_SECRET,
             oauth_token=self.oauth_token,
             oauth_token_secret=self.oauth_token_secret,
             api=self.api_base,

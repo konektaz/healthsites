@@ -2,6 +2,7 @@
 
 import requests
 from django.conf import settings
+
 from social_users.models import Profile, TrustedUser
 
 
@@ -38,8 +39,8 @@ def get_profile(user, request=None):
     # GETTING SOCIAL LINK
     user.social = []
     try:
-        uid = user.social_auth.get(provider='openstreetmap').uid
-        user.social.append({'provider': 'openstreetmap', 'uid': uid})
+        uid = user.social_auth.get(provider=settings.DEFAULT_PROVIDER).uid
+        user.social.append({'provider': settings.DEFAULT_PROVIDER, 'uid': uid})
     except Exception as e:  # noqa
         pass
 
@@ -63,12 +64,15 @@ def get_profile(user, request=None):
 
     if not profile_picture:
         try:
-            profile_picture = user.social_auth.get(provider='openstreetmap').extra_data['avatar']
+            profile_picture = user.social_auth.get(
+                provider=settings.DEFAULT_PROVIDER
+            ).extra_data['avatar']
         except Exception:
             pass
 
     user.profile_picture = profile_picture
     user.provider = provider
+    user.is_default_provider = provider == settings.DEFAULT_PROVIDER
 
     return user
 
@@ -83,7 +87,9 @@ def get_osm_name(user):
         return profile.osm_name
     # get osm name from API
     try:
-        id = user.social_auth.get(provider='openstreetmap').extra_data['id']
+        id = user.social_auth.get(
+            provider=settings.DEFAULT_PROVIDER
+        ).extra_data['id']
         url = settings.OSM_API_URL + '/api/0.6/user/%s' % id
         session = requests.Session()
         response = session.get(url)
