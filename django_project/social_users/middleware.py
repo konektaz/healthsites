@@ -1,7 +1,9 @@
 __author__ = 'Irwan Fathurrahman <meomancer@gmail.com>'
 __date__ = '20/12/21'
 
+from django.conf import settings
 from django.contrib.auth.models import User
+
 from social_users.models import Profile
 
 
@@ -21,12 +23,16 @@ def save_profile(backend, user, response, *args, **kwargs):
 
     profile_picture = None
     if backend.name == 'facebook':
-        profile_picture = 'http://graph.facebook.com/%s/picture?type=large' % response['id']
+        profile_picture = (
+            f"http://graph.facebook.com/${response['id']}/picture?type=large"
+        )
     elif backend.name == 'twitter':
-        profile_picture = response.get('profile_image_url', '').replace('_normal', '')
+        profile_picture = response.get(
+            'profile_image_url', ''
+        ).replace('_normal', '')
     elif backend.name == 'google-oauth2':
         profile_picture = response['image'].get('url')
-    elif backend.name == 'openstreetmap':
+    elif backend.name == settings.DEFAULT_PROVIDER:
         profile_picture = response['avatar']
 
     profile, created = Profile.objects.get_or_create(user=user)

@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
 import json
+from os.path import exists
+
 import overpass
 import yaml
-
-from os.path import exists
-from social_django.models import UserSocialAuth
-from api import osm_tag_defintions
-from api.osm_api_client import OsmApiWrapper
-from api.osm_field_definitions import ALL_FIELDS, get_mandatory_fields
-from api.osm_tag_defintions import get_mandatory_tags, update_tag_options
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from social_django.models import UserSocialAuth
 
+from api import osm_tag_defintions
+from api.osm_api_client import OsmApiWrapper
+from api.osm_field_definitions import ALL_FIELDS, get_mandatory_fields
+from api.osm_tag_defintions import get_mandatory_tags, update_tag_options
 from core.settings.utils import ABS_PATH
 from social_users.models import TrustedUser, Organisation
 
@@ -56,9 +56,9 @@ def get_oauth_token(user):
     :rtype: tuple
     """
     try:
-        social_auth = user.social_auth.get(provider='openstreetmap')
+        social_auth = user.social_auth.get(provider=settings.DEFAULT_PROVIDER)
         access_token = social_auth.extra_data['access_token']
-        return access_token['oauth_token'], access_token['oauth_token_secret']
+        return access_token, access_token
     except UserSocialAuth.DoesNotExist:
         raise Exception('This user is not linked to openstreetmap yet')
 
@@ -157,7 +157,9 @@ def convert_to_osm_tag(mapping_file_path, data, osm_type):
                 if len(data[column['name']]) == 0:
                     del data[column['name']]
                 else:
-                    data[column['name']] = '%s' % ';'.join(data[column['name']])
+                    data[column['name']] = '%s' % ';'.join(
+                        data[column['name']]
+                    )
         except:  # noqa
             pass
 
@@ -226,8 +228,13 @@ def verify_user(uploader, creator, ignore_uploader_staff=False):
     try:
         creator = get_object_or_404(User, username=creator)
         if creator not in (
-                [trusted_user.user for trusted_user in TrustedUser.objects.filter(
-                    organisation=organisation)]):
+                [
+                    trusted_user.user for trusted_user in
+                    TrustedUser.objects.filter(
+                        organisation=organisation
+                    )
+                ]
+        ):
             return False, 'User %s is not a trusted user.' % creator
     except Http404:
         return False, 'User %s is not exist.' % creator
@@ -268,7 +275,9 @@ def validate_osm_tags(osm_tags):
     # Mandatory tags check
     mandatory_tags = get_mandatory_tags(osm_tags)
     for mandatory_tag in mandatory_tags:
-        if mandatory_tag['key'] not in osm_tags.keys() or not osm_tags[mandatory_tag['key']]:
+        if mandatory_tag['key'] not in osm_tags.keys() or not osm_tags[
+            mandatory_tag['key']
+        ]:
             message = 'Invalid OSM tags: `{}` tag is missing.'.format(
                 mandatory_tag['key'])
             return False, message
@@ -307,8 +316,12 @@ def validate_osm_tags(osm_tags):
         if tag_definition['type'] == list:
             if not isinstance(item, list):
                 item = [item]
-        if item is not None and not isinstance(item, tag_definition.get('type')):
-            if not (isinstance(item, str) and tag_definition.get('type') == str):
+        if item is not None and not isinstance(
+                item, tag_definition.get('type')
+        ):
+            if not (
+                    isinstance(item, str) and tag_definition.get('type') == str
+            ):
                 message = (
                     'Invalid value type for key `{}`: '
                     'Expected type `{}`, got `{}` instead.').format(
@@ -398,8 +411,8 @@ def create_osm_node(user, data):
     """
     oauth_token, oauth_token_secret = get_oauth_token(user)
     osm_api = OsmApiWrapper(
-        client_key=settings.SOCIAL_AUTH_OPENSTREETMAP_KEY,
-        client_secret=settings.SOCIAL_AUTH_OPENSTREETMAP_SECRET,
+        client_key=settings.SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_KEY,
+        client_secret=settings.SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_SECRET,
         oauth_token=oauth_token,
         oauth_token_secret=oauth_token_secret,
         api=settings.OSM_API_URL,
@@ -443,8 +456,8 @@ def update_osm_node(user, data):
     """
     oauth_token, oauth_token_secret = get_oauth_token(user)
     osm_api = OsmApiWrapper(
-        client_key=settings.SOCIAL_AUTH_OPENSTREETMAP_KEY,
-        client_secret=settings.SOCIAL_AUTH_OPENSTREETMAP_SECRET,
+        client_key=settings.SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_KEY,
+        client_secret=settings.SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_SECRET,
         oauth_token=oauth_token,
         oauth_token_secret=oauth_token_secret,
         api=settings.OSM_API_URL,
@@ -484,8 +497,8 @@ def update_osm_way(user, data):
     """
     oauth_token, oauth_token_secret = get_oauth_token(user)
     osm_api = OsmApiWrapper(
-        client_key=settings.SOCIAL_AUTH_OPENSTREETMAP_KEY,
-        client_secret=settings.SOCIAL_AUTH_OPENSTREETMAP_SECRET,
+        client_key=settings.SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_KEY,
+        client_secret=settings.SOCIAL_AUTH_OPENSTREETMAP_OAUTH2_SECRET,
         oauth_token=oauth_token,
         oauth_token_secret=oauth_token_secret,
         api=settings.OSM_API_URL,

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from unittest import skip
 
-from django.urls import reverse
+from django.conf import settings
 from django.test import Client, TestCase
+from django.urls import reverse
 from mock import patch, MagicMock
 
 from .model_factories import UserF, UserSocialAuthF
@@ -21,7 +22,7 @@ class TestViews(TestCase):
     def test_profile_view(self):
         user = UserF(username='test1', password='test1')
         UserSocialAuthF.create(
-            provider='openstreetmap',
+            provider=settings.DEFAULT_PROVIDER,
             uid='2418849',
             extra_data='{"access_token":"qwertqwert"}',
             user=user
@@ -31,7 +32,9 @@ class TestViews(TestCase):
         resp = self.client.get(reverse('userprofilepage'))
 
         self.assertEqual(resp.status_code, 200)
-        self.assertListEqual(resp.context['auths'], [u'openstreetmap'])
+        self.assertListEqual(
+            resp.context['auths'], [settings.DEFAULT_PROVIDER]
+        )
         self.assertListEqual(
             [tmpl.name for tmpl in resp.templates], [
                 'social_users/profilepage.html', u'base.html',

@@ -4,9 +4,11 @@ services:
     volumes:
       - ./volumes/database:/var/lib/postgresql/13
       - ./volumes/backups:/backups
+
   dbbackups:
     volumes:
       - ./volumes/backups:/backups
+
   django:
     build:
       context: ../
@@ -17,6 +19,7 @@ services:
       - ./volumes/static:/home/web/static
       - ./volumes/media:/home/web/media
       - ./volumes/cache:/home/web/cache
+
   worker:
     build:
       context: ../
@@ -26,14 +29,17 @@ services:
       - ./volumes/static:/home/web/static
       - ./volumes/media:/home/web/media
       - ./volumes/cache:/home/web/cache
+
   nginx:
-    build:
-      context: ../
-      dockerfile: deployment/nginx/Dockerfile
     volumes:
-      - ./volumes/static:/home/web/static:ro
-      - ./volumes/media:/home/web/media:ro
-      - ./volumes/cache:/home/web/cache:ro
+      - ./nginx/sites-enabled:/etc/nginx/conf.d:ro
+      - ./volumes/static:/home/web/static
+      - ./volumes/media:/home/web/media
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    links:
+      - django
+
   dev:
     build:
       context: ../
@@ -50,5 +56,5 @@ services:
       - "2000:8080"
       # for ssh
       - "2001:22"
-    entrypoint: []
-    profiles: ["dev"]
+    entrypoint: [ ]
+    profiles: [ "dev" ]

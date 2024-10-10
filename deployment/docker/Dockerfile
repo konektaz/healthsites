@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 AS prod
+FROM ubuntu:20.04 AS prod
 MAINTAINER Irwan Fathurrahman<meomancer@gmail.com>
 
 # Pandoc needed to generate rst dumps, uic compressor needed for django-pipeline
@@ -20,10 +20,6 @@ ENV LC_ALL en_ZA.UTF-8
 ADD deployment/docker/REQUIREMENTS.txt /REQUIREMENTS.txt
 RUN pip3 install --upgrade pip && pip install --upgrade pip
 RUN pip install -r /REQUIREMENTS.txt
-
-RUN apt-get install nodejs-dev node-gyp libssl1.0-dev -y
-RUN apt-get install npm -y
-RUN npm -g install yuglify
 
 RUN ln -s /usr/bin/python3 /usr/local/bin/python
 

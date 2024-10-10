@@ -4,7 +4,7 @@
         <div class="person col-xs-8 pad0x">
             <div class="avatar-holder">
                 <img src="{% static "img/av-holder.svg" %}" class="frame" width="48" height="48"/>
-                {% if user.provider == "openstreetmap" %}
+                {% if user.is_default_provider %}
                     <img height="14" class="avatar-icon" src="{% static "img/osm-logo.png" %}" title="OpenStreetMap"/>
                 {% elif user.provider == "facebook" %}
                     <i class="fa fa-facebook-square avatar-icon"></i>
@@ -30,7 +30,7 @@
                 You are not signed in
             </span>
         </div>
-        <a href="{% url 'social:begin' 'openstreetmap' %}?next=/map" id="signin-button" type="button" class="button col-xs-4 pad0x blue stroke" data-toggle="modal">
+        <a href="{% url 'social:begin' 'openstreetmap-oauth2' %}?next=/map" id="signin-button" type="button" class="button col-xs-4 pad0x blue stroke" data-toggle="modal">
             <i class="fa fa-sign-in"></i> sign in
         </a>
     {% endif %}

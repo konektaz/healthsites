@@ -13,7 +13,7 @@
             </a>
         </div>
     </div>
-    {% if user.provider == "openstreetmap" %}
+    {% if user.is_default_provider %}
         <div id="edit-healthsite" class="button-wrapper col-xs-4">
             <a class="button edit stroke blue">
                 <i class="fa fa-pencil"></i> edit

@@ -6,7 +6,7 @@ import time
 from osmapi import (
     OsmApi, ApiError,
     ResponseEmptyApiError, ElementDeletedApiError)
-from requests_oauthlib import OAuth1
+from requests_oauthlib import OAuth2
 
 LOG = logging.getLogger(__name__)
 
@@ -76,7 +76,6 @@ class OsmApiWrapper(OsmApi, object):
         If the response status code indicates an error,
         `OsmApi.ApiError` is raised.
         """
-        self._debug and self.log_request()
 
         # Add API base URL to path
         path = self._api + path
@@ -84,17 +83,18 @@ class OsmApiWrapper(OsmApi, object):
         user_credentials = None
         if auth:
             try:
-                user_credentials = OAuth1(
-                    client_key=self._client_key,
-                    client_secret=self._client_secret,
-                    resource_owner_key=self._oauth_token,
-                    resource_owner_secret=self._oauth_token_secret,
+                user_credentials = OAuth2(
+                    client_id=self._client_key,
+                    token={
+                        'access_token': self._oauth_token
+                    }
                 )
             except AttributeError:
                 raise OAuthTokenMissingError
 
         response = self._session.request(
-            method, path, auth=user_credentials, data=send)
+            method, path, auth=user_credentials, data=send
+        )
         if response.status_code != 200:
             payload = response.content.strip()
             if response.status_code == 410:
@@ -109,7 +109,7 @@ class OsmApiWrapper(OsmApi, object):
                 ''
             )
 
-        self._debug and self.log_request()
+        self._debug and self.log_request('GET', path)
 
         return response.content
 
@@ -155,7 +155,9 @@ class OsmApiWrapper(OsmApi, object):
             raise Exception(
                 "can't update the healthsite because the data doesn't match with osm")
         current_data['tag'].update(updated_data['tag'])
-        updated_data['tag'] = {k: v for k, v in current_data['tag'].items() if v is not None}
+        updated_data['tag'] = {
+            k: v for k, v in current_data['tag'].items() if v is not None
+        }
         return updated_data
 
     def create_node(self, data, comment=None, source=None):
