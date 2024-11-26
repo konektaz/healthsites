@@ -10,3 +10,4 @@ __pycache__/
 
 django_project/.pycharm_helpers/
 celerybeat-schedule*
+django_project/frontend/static/.DS_Store
