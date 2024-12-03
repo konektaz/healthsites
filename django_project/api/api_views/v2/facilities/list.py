@@ -121,7 +121,9 @@ class GetFacilities(
 
         try:
             queryset = self.get_query_by_page(self.get_healthsites(request))
-        except (LessThanOneException, NotANumberException) as e:
+        except (
+                LessThanOneException, NotANumberException, BadRequestError
+        ) as e:
             return HttpResponseBadRequest('%s' % e)
 
         return Response(self.serialize(queryset, many=True))
