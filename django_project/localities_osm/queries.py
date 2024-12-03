@@ -2,6 +2,7 @@ __author__ = 'Irwan Fathurrahman <meomancer@gmail.com>'
 __date__ = '20/12/21'
 
 from django.contrib.gis.geos import Polygon
+
 from api.api_views.v2.geocode.search import search_by_geoname
 from core.utils import parse_bbox
 from localities.models.administration import Country
@@ -13,7 +14,9 @@ def all_locality():
 
 
 def filter_locality(
-        extent=None, country=None, timestamp_from=None, timestamp_to=None, place=None, filters={}):
+        extent=None, country=None, timestamp_from=None, timestamp_to=None,
+        place=None, filters={}
+):
     """ Filter osm locality by extent and country
     :param extent: extent of data
     :type extent: str (with comma separator)
@@ -31,13 +34,6 @@ def filter_locality(
     """
     # check extent data
     queryset = all_locality()
-    if extent:
-        try:
-            polygon = parse_bbox(extent)
-        except (ValueError, IndexError):
-            raise Exception('extent is incorrect format')
-        queryset = queryset.in_polygon(polygon)
-
     # check by country
     if country:
         try:
@@ -48,6 +44,15 @@ def filter_locality(
                 queryset = queryset.in_administrative(country.get_codes)
         except Country.DoesNotExist:
             raise Exception('%s is not found or not a country.' % country)
+
+    if extent:
+        try:
+            polygon = parse_bbox(extent)
+        except (ValueError, IndexError):
+            raise Exception(
+                'extend should be in format minLng,minLat,maxLng,maxLat'
+            )
+        queryset = queryset.in_polygon(polygon)
 
     if place:
         try:
