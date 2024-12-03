@@ -16,7 +16,7 @@ VERSION = os.environ.get('VERSION', '')
 APP_NAME = 'Healthsites.io'
 ALLOWED_HOSTS = ['*']
 ADMINS = (
-    ('Irwan Fathurrahman', 'meomancer@gmail.com'),
+    ('Irwan Fathurrahman', 'irwan@kartoza.com'),
 )
 DATABASES = {
     'default': {
